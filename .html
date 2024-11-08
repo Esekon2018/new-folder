@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Presidential Election Poll</title>
+  <style>
+    /* Reset and Basic Styling */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Arial', sans-serif;
+    }
+
+    body, html {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* Background Animation */
+    .bg-animation {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(120deg, #ff7e5f, #feb47b);
+      background-size: 200% 200%;
+      animation: gradientAnimation 8s ease infinite;
+      z-index: -1;
+    }
+
+    @keyframes gradientAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Centered Content */
+    .content, .poll-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      color: #fff;
+      text-align: center;
+      padding: 0 20px;
+    }
+
+    .headline {
+      font-size: 3.5rem;
+      margin-bottom: 0.5rem;
+      letter-spacing: 2px;
+      animation: fadeIn 2s ease-out;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    }
+
+    .subheadline {
+      font-size: 1.5rem;
+      font-weight: 300;
+      margin-bottom: 2rem;
+      opacity: 0.9;
+      animation: fadeIn 2.5s ease-out;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    }
+
+    .cta-button {
+      padding: 1rem 2rem;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #333;
+      background-color: #fff;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      animation: fadeIn 3s ease-out;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .cta-button:hover {
+      transform: scale(1.05);
+      background-color: #ff7e5f;
+      color: #fff;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Poll Styling */
+    .poll-container {
+      background-color: rgba(255, 255, 255, 0.9);
+      color: #333;
+      transition: background 0.4s ease-in-out;
+      display: none; /* Initially hidden */
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      text-align: center;
+      max-width: 420px;
+      width: 100%;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    h2 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      color: #4a90e2; /* Headline color */
+    }
+
+    .candidate {
+      margin: 15px 0;
+      text-align: center;
+      position: relative;
+    }
+
+    .candidate img {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: transform 0.3s ease-in-out;
+      border: 2px solid #4a90e2; /* Add border to candidate images */
+    }
+
+    .candidate img:hover {
+      transform: scale(1.1);
+      border-color: #ff7e5f; /* Change border color on hover */
+    }
+
+    .vote-button {
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      background: linear-gradient(120deg, #007bff, #0056b3);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    .vote-button:hover {
+      background: linear-gradient(120deg, #0056b3, #003e75);
+      transform: scale(1.05);
+    }
+
+    .results {
+      margin-top: 25px;
+      font-size: 1.1rem;
+    }
+
+    .result-bar-container {
+      margin: 10px 0;
+      width: 100%;
+      background-color: #e4e4e4;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .result-bar {
+      height: 20px;
+      transition: width 0.5s ease;
+    }
+
+    .result-bar-a {
+      background-color: #4a90e2;
+    }
+
+    .result-bar-b {
+      background-color: #f06c64;
+    }
+
+    /* Voter List Styling */
+    .voter-list {
+      margin-top: 20px;
+      font-size: 1rem;
+      text-align: left;
+      max-height: 100px;
+      overflow-y: auto;
+      border-top: 1px solid #ccc;
+      padding-top: 10px;
+    }
+
+    /* Modal Styling */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000; /* Ensure modal is on top */
+    }
+
+    .modal-content {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin-bottom: 15px; /* Add margin below image */
+    }
+
+    .close-button {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: #333;
+      cursor: pointer;
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      transition: color 0.3s;
+    }
+
+    .close-button:hover {
+      color: #ff7e5f; /* Change color on hover */
+    }
+
+    /* Responsive Design */
+    @media (max-width: 600px) {
+      .headline {
+        font-size: 2.5rem;
+      }
+
+      .subheadline {
+        font-size: 1.2rem;
+      }
+
+      .cta-button {
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+      }
+
+      .vote-button {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-animation"></div>
+  
+  <div class="content" id="landingPage">
+    <h1 class="headline">TUCUSA PRESIDENTIAL ELECTION 2025</h1>
+    <p class="subheadline">Your vote, your choice. Let's vote to experience the next level of leadership from our contestants.</p>
+    <button class="cta-button" id="getStartedButton">Get Started</button>
+  </div>
+
+  <div class="poll-container" id="pollPage">
+    <h2>Cast Your Vote</h2>
+
+    <!-- Candidate A Section -->
+    <div class="candidate">
+      <img src="candidateA.jpg" alt="Debra Lobei" onclick="openModal('Debra Lobei', 'candidateA.jpg', 'Debra Lobei promises economic growth.')">
+      <button class="vote-button" onclick="vote('Debra Lobei')">Vote for Debra Lobei</button>
+    </div>
+
+    <!-- Candidate B Section -->
+    <div class="candidate">
+      <img src="candidateB.jpg" alt="Rahab Lobei" onclick="openModal('Rahab Lobei', 'candidateB.jpg', 'Rahab Lobei focuses on healthcare reform.')">
+      <button class="vote-button" onclick="vote('Rahab Lobei')">Vote for Rahab Lobei</button>
+    </div>
+
+    <!-- Results Section -->
+    <div class="results">
+      <h3>Results</h3>
+      <div class="result-bar-container">
+        <div id="resultBarA" class="result-bar result-bar-a"></div>
+      </div>
+      <div class="result-bar-container">
+        <div id="resultBarB" class="result-bar result-bar-b"></div>
+      </div>
+      <div class="voter-list" id="voterList"></div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal" id="candidateModal">
+    <div class="modal-content">
+      <button class="close-button" onclick="closeModal()">&times;</button>
+      <img id="modalImage" src="" alt="">
+      <h3 id="modalTitle"></h3>
+      <p id="modalDescription"></p>
+    </div>
+  </div>
+
+  <script>
+    // Initial vote counts
+    let votes = {
+      "Debra Lobei": 0,
+      "Rahab Lobei": 0
+    };
+
+    // Track voters and device IDs
+    const voters = new Set();
+    const deviceIds = new Set();
+
+    // Function to get a simple device ID (you can use more robust methods)
+    function getDeviceId() {
+      return navigator.userAgent; // This is a very basic implementation
+    }
+
+    // Handle vote logic
+    function vote(candidate) {
+      const deviceId = getDeviceId();
+      const voterId = prompt("Please enter your voter ID:");
+      if (!voterId) {
+        alert("Voter ID is required to vote.");
+        return;
+      }
+
+      if (voters.has(voterId) || deviceIds.has(deviceId)) {
+        alert("You have already voted.");
+        return;
+      }
+
+      // Record the vote
+      votes[candidate]++;
+      voters.add(voterId);
+      deviceIds.add(deviceId); // Add device ID to the set
+
+      // Update results
+      updateResults();
+      alert(`Thank you for voting for ${candidate}!`);
+    }
+
+    // Update results and display them
+    function updateResults() {
+      const totalVotes = votes["Debra Lobei"] + votes["Rahab Lobei"];
+      const percentageA = totalVotes ? (votes["Debra Lobei"] / totalVotes) * 100 : 0;
+      const percentageB = totalVotes ? (votes["Rahab Lobei"] / totalVotes) * 100 : 0;
+
+      document.getElementById("resultBarA").style.width = percentageA + "%";
+      document.getElementById("resultBarB").style.width = percentageB + "%";
+
+      // Update voter list
+      const voterList = document.getElementById("voterList");
+      voterList.innerHTML = Array.from(voters).join(", ") || "No voters yet.";
+    }
+
+    // Show poll page and hide landing page
+    document.getElementById("getStartedButton").addEventListener("click", function() {
+      document.getElementById("landingPage").style.display = "none";
+      document.getElementById("pollPage").style.display = "flex";
+    });
+
+    // Open modal function
+    function openModal(title, image, description) {
+      document.getElementById("modalTitle").innerText = title;
+      document.getElementById("modalImage").src = image;
+      document.getElementById("modalDescription").innerText = description;
+      document.getElementById("candidateModal").style.display = "flex";
+    }
+
+    // Close modal function
+    function closeModal() {
+      document.getElementById("candidateModal").style.display = "none";
+    }
+  </script>
+</body>
+</html>
